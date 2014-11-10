@@ -14,6 +14,16 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+//import com.example.light.MainActivity.connect_thread;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -62,69 +72,97 @@ public void addListenerOnButton() {
 			//	server_IP = server_IP_addres.getText().toString();
 			//	Thread myThread = new Thread(new connect_thread());
 			//	myThread.start();
-				from_s_place=from_place.getText().toString();
-				to_s_place=To_place.getText().toString();
-				Start_s_time=start_time.getText().toString();
-				Log.v("Amith",from_place.getText().toString());
-				System.out.println(from_place.getText().toString());
-				Calendar cal = Calendar.getInstance();
-		    	cal.getTime();
-		        sdf = new SimpleDateFormat("HH:mm:ss");
-		    	current_time= sdf.format(cal.getTime());
-		    	
-		    	try {
-
-					conn = DriverManager.getConnection(
-							"jdbc:oracle:thin:@lnxdb-idev3-vm-005.cisco.com:1522:MIGIDEV", "SCMTOOLS",
-							"scm#wft00l");
-
-				} catch (SQLException e) {
-
-					System.out.println("Connection Failed! Check output console");
-					e.printStackTrace();
-					return;
-
-				}
-
-				if (conn!= null) {
-					System.out.println("You made it, take control your database now!");
-				flag=1;
 				
-				} else {
-					System.out.println("Failed to make connection!");
-				}
-
 				
-		//		Intent intent = new Intent(context, App2Activity.class);
-          //      startActivity(intent); 
+				Thread myThread = new Thread(new connect_thread());
+				myThread.start();
 				
-	
-				try {
-					  updateemp = conn.prepareStatement("insert into user_table values(?,?,?,?)");
-					  updateemp.setString(1,from_s_place);
-				      updateemp.setString(2,to_s_place);
-				      updateemp.setString(3,Start_s_time);
-				      updateemp.setString(4,current_time);
-				      updateemp.executeUpdate();
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					  e.printStackTrace();
-				}
-				
-				Intent intent = new Intent(context, DisplayMessageActivity.class);
-				startActivity(intent);
-				try{
-				 stmt.close();
-				 updateemp.close();
-	                conn.close();
-	  		        } catch (Exception e) {  }
-
 				
 				
 				
 	
 }	});
 	
+}
+
+
+public class connect_thread implements Runnable
+{
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		try{
+			
+
+			from_s_place=from_place.getText().toString();
+			to_s_place=To_place.getText().toString();
+			Start_s_time=start_time.getText().toString();
+			Log.v("Amith",from_place.getText().toString());
+			System.out.println(from_place.getText().toString());
+			Calendar cal = Calendar.getInstance();
+	    	cal.getTime();
+	        sdf = new SimpleDateFormat("HH:mm:ss");
+	    	current_time= sdf.format(cal.getTime());
+	    	
+			
+	    	
+	    	JSONObject user_info = new JSONObject();
+	    	try
+	    	{
+	    	user_info.put("FROM_PLACE",from_s_place);
+	    	user_info.put("TO_PLACE",to_s_place);
+	    	user_info.put("START_TIME",Start_s_time);
+	    	user_info.put("CURRENT_TIME",current_time);
+	    	
+	    	System.out.println(user_info.getString("FROM_PLACE"));
+	    	}
+	    	
+	    	
+	    	
+	    	catch (JSONException e) {
+	    	// TODO Auto-generated catch block
+	    	e.printStackTrace();
+	    	}
+	    	boolean result = false;
+	    	HttpClient hc = new DefaultHttpClient();
+	    	String message;
+
+	    	HttpPut p = new HttpPut("http://vm-amkb-001.cisco.com:4567/app");
+
+
+	    	try {
+	    	message = user_info.toString();
+
+	    	p.setEntity(new StringEntity(message, "UTF8"));
+	    	p.setHeader("Content-type", "application/json");
+	    	HttpResponse resp = hc.execute(p);
+	    	if (resp != null) {
+	    	if (resp.getStatusLine().getStatusCode() == 200)
+	    	result = true;
+	    	}
+
+	    	Log.d("Status line", "" + resp.getStatusLine().getStatusCode());
+	    	} catch (Exception e) {
+	    	e.printStackTrace();
+
+	    	}
+	    	 
+
+	    
+	if(result)
+
+	{	
+			Intent intent = new Intent(context, DisplayMessageActivity.class);
+			startActivity(intent);
+			
+			
+	}	
+	
+			
+		}
+		catch (Exception E){	}
+	}
 }
 		
 		

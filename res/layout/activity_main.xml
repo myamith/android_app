@@ -16,7 +16,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="52dp"
         android:ems="10" 
-  		android:text="From"/>
+  		android:hint="From"/>
 
     <EditText
         android:id="@+id/editText2"
@@ -26,7 +26,7 @@
         android:layout_below="@+id/editText1"
         android:layout_marginTop="60dp"
         android:ems="10"
-        android:text="To" />
+        android:hint="To" />
 
     <CheckBox
         android:id="@+id/checkBox1"
@@ -45,7 +45,7 @@
         android:layout_below="@+id/checkBox1"
         android:layout_marginTop="29dp"
         android:ems="10"
-        android:text="start time" >
+        android:hint="start time" >
 
         <requestFocus />
     </EditText>
